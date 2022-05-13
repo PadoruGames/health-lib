@@ -1,3 +1,4 @@
+using Padoru.Core;
 using System;
 using UnityEngine;
 
@@ -11,18 +12,19 @@ namespace Padoru.Health
 
 		public event Action OnHeal;
 		public event Action OnDamage;
-		public event Action OnHealthChanged;
-		public event Action OnMaxHealthChanged;
 		public event Action OnDeath;
 
         public int CurrentHealth { get; private set; }
         public int MaxHealth => maxHealth;
-        public float CurrentHealthNormalized => (float)CurrentHealth / MaxHealth;
 		public bool IsAlive => CurrentHealth > 0;
+
+		public SubscribableValue<float> NormalizedCurrentHealth { get; private set; }
 
 		private void Awake()
 		{
 			CurrentHealth = MaxHealth;
+
+			NormalizedCurrentHealth = new SubscribableValue<float>((float)CurrentHealth / MaxHealth);
 
 			Debug.Log($"Health component initialized with {MaxHealth} maxHealth", Constants.DEBUG_CHANNEL, gameObject);
 		}
@@ -37,7 +39,7 @@ namespace Padoru.Health
 
 			CurrentHealth = Mathf.Clamp(CurrentHealth - damageAmount, 0, MaxHealth);
 			OnDamage?.Invoke();
-			OnHealthChanged?.Invoke();
+			NormalizedCurrentHealth.Value = (float)CurrentHealth / MaxHealth;
 			damageDealer?.OnDamageDealt();
 
 			Debug.Log($"Unit damaged by {damageAmount}. Current Health: {CurrentHealth}. Damage dealer: {damageDealer}", Constants.DEBUG_CHANNEL, gameObject);
@@ -58,7 +60,7 @@ namespace Padoru.Health
 
 			CurrentHealth = Mathf.Clamp(CurrentHealth + healAmount, 0, MaxHealth);
 			OnHeal?.Invoke();
-			OnHealthChanged?.Invoke();
+			NormalizedCurrentHealth.Value = (float)CurrentHealth / MaxHealth;
 
 			Debug.Log($"Unit healed by {healAmount}. Current Health: {CurrentHealth}", Constants.DEBUG_CHANNEL, gameObject);
 		}
@@ -66,7 +68,7 @@ namespace Padoru.Health
 		public void SetMaxHealth(int maxHealth)
 		{
 			this.maxHealth = maxHealth;
-			OnMaxHealthChanged?.Invoke();
+			NormalizedCurrentHealth.Value = (float)CurrentHealth / MaxHealth;
 
 			Debug.Log($"Unit max health changed to {maxHealth}", Constants.DEBUG_CHANNEL, gameObject);
 		}
