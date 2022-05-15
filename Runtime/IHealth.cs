@@ -16,6 +16,7 @@ namespace Padoru.Health
 
 		void Damage(int damageAmount, IDamageDealer damageDealer = null);
 		void Heal(int healAmount);
+		void Kill(IDamageDealer damageDealer = null);
 		void SetMaxHealth(int maxHealth);
 		void Reset();
 	}

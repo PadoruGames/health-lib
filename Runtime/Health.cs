@@ -65,6 +65,11 @@ namespace Padoru.Health
 			Debug.Log($"Unit healed by {healAmount}. Current Health: {CurrentHealth}", Constants.DEBUG_CHANNEL, gameObject);
 		}
 
+		public void Kill(IDamageDealer damageDealer = null)
+		{
+			Damage(maxHealth, damageDealer);
+		}
+
 		public void SetMaxHealth(int maxHealth)
 		{
 			this.maxHealth = maxHealth;
